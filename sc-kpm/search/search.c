@@ -25,6 +25,8 @@ sc_event *event_question_search_all_identifiers;
 sc_event *event_question_search_all_identified_elements;
 sc_event *event_question_search_links_of_relation_connected_with_element;
 
+sc_event *event_question_search_book_template;
+
 // --------------------- Module ------------------------
 
 _SC_EXT_EXTERN sc_result initialize()
@@ -78,6 +80,11 @@ _SC_EXT_EXTERN sc_result initialize()
     if (event_question_search_links_of_relation_connected_with_element == null_ptr)
         return SC_RESULT_ERROR;
 
+
+    event_question_search_book_template = sc_event_new(s_default_ctx, keynode_question_initiated, SC_EVENT_ADD_OUTPUT_ARC, 0, agent_search_book_template, 0);
+    if (event_question_search_book_template == null_ptr)
+        return SC_RESULT_ERROR;
+
     return SC_RESULT_OK;
 }
 
@@ -105,6 +112,9 @@ _SC_EXT_EXTERN sc_result shutdown()
         sc_event_destroy(event_question_search_all_superclasses_in_quasybinary_relation);
     if (event_question_search_links_of_relation_connected_with_element)
         sc_event_destroy(event_question_search_links_of_relation_connected_with_element);
+
+    if (event_question_search_book_template)
+        sc_event_destroy(event_question_search_book_template);
 
     sc_memory_context_free(s_default_ctx);
 

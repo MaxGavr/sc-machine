@@ -29,6 +29,8 @@ sc_addr keynode_question_search_all_subclasses_in_quasybinary_relation;
 sc_addr keynode_question_search_links_of_relation_connected_with_element;
 sc_addr keynode_question_search_full_pattern;
 
+sc_addr keynode_question_book_template;
+
 sc_addr keynode_question;
 sc_addr keynode_question_initiated;
 sc_addr keynode_nrel_answer;
@@ -65,6 +67,8 @@ const char keynode_question_decomposition_str[] = "question_search_decomposition
 const char keynode_question_all_identifiers_str[] = "question_search_all_identifiers";
 const char keynode_question_all_identified_elements_str[] = "question_search_all_identified_elements";
 const char keynode_question_search_full_pattern_str[] = "question_full_pattern_search";
+
+const char keynode_question_book_template_str[] = "question_search_book_by_template";
 
 const char keynode_question_search_all_subclasses_in_quasybinary_relation_str[] = "question_search_all_subclasses_in_quasybinary_relation";
 const char keynode_question_search_all_superclasses_in_quasybinary_relation_str[] = "question_search_all_superclasses_in_quasybinary_relation";
@@ -111,6 +115,8 @@ sc_result search_keynodes_initialize()
     RESOLVE_KEYNODE(s_default_ctx, keynode_question_search_all_superclasses_in_quasybinary_relation);
     RESOLVE_KEYNODE(s_default_ctx, keynode_question_search_links_of_relation_connected_with_element);
     RESOLVE_KEYNODE(s_default_ctx, keynode_question_search_full_pattern);
+
+    RESOLVE_KEYNODE(s_default_ctx, keynode_question_book_template);
 
     RESOLVE_KEYNODE(s_default_ctx, keynode_question_initiated);
     RESOLVE_KEYNODE(s_default_ctx, keynode_question);
