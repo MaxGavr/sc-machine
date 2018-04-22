@@ -88,8 +88,6 @@ void append_book_to_answer(sc_type_result* search_result, sc_addr answer, sc_add
 
 sc_result agent_search_book_template(const sc_event *event, sc_addr arg)
 {
-    printf("~~~Searching book by template~~~~\n");
-
     sc_addr question;
 
     if (!sc_memory_get_arc_end(s_default_ctx, arg, &question))
@@ -98,6 +96,8 @@ sc_result agent_search_book_template(const sc_event *event, sc_addr arg)
     // check question type
     if (sc_helper_check_arc(s_default_ctx, keynode_question_book_template, question, sc_type_arc_pos_const_perm) == SC_FALSE)
         return SC_RESULT_ERROR_INVALID_TYPE;
+
+    printf("~~~Searching book by template~~~~\n");
 
     sc_addr answer = create_answer_node();
 
