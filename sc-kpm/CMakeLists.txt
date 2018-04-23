@@ -16,3 +16,5 @@ add_subdirectory(ui)
 add_subdirectory(search)
 add_subdirectory(utils)
 add_subdirectory(scp)
+
+add_subdirectory(search-books)

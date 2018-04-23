@@ -13,6 +13,4 @@
 #include "agents/search_identifiers.h"
 #include "agents/search_structure.h"
 
-#include "agents/books/search_book_template.h"
-
 #endif

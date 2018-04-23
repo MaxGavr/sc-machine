@@ -6,10 +6,6 @@ add_library (search SHARED ${SOURCES_CPP} ${SOURCES_C} ${HEADERS})
 
 include_directories("${SC_KPM_ROOT}/search" ${SC_MEMORY_SRC} ${GLIB2_INCLUDE_DIRS})
 add_dependencies(search sc-memory)
-target_link_libraries(search sc-kpm-common search-books)
-
-add_subdirectory(agents/books)
+target_link_libraries(search sc-kpm-common)
 
 install_targets("/lib/sc-memory/extensions" search)
-
-
