@@ -13,6 +13,7 @@ extern "C"
 #include "sc_helper.h"
 }
 
+// for sys_search
 #include <sc-kpm/scp/scp_lib/scp_system_operators/sc_system_search.h>
 
 
@@ -29,7 +30,6 @@ sc_bool resolve_links(sc_addr pattern, sc_type_result& resolved_links)
         sc_addr link = sc_iterator3_value(links_iterator, 2);
 
         sc_stream* link_content = NULL;
-        // TODO: check result
         sc_memory_get_link_content(s_books_ctx, link, &link_content);
 
         sc_char link_content_str[256] = "";
@@ -45,6 +45,8 @@ sc_bool resolve_links(sc_addr pattern, sc_type_result& resolved_links)
         {
             if (found_links_count > 2)
                 printf("Found >1 links with the same content\n");
+
+            printf("Failed to resolve link\n");
 
             links_resolved = SC_FALSE;
             break;
@@ -83,7 +85,26 @@ void append_book_to_answer(sc_type_result* search_result, sc_addr answer)
     }
 }
 
-sc_result agent_search_book_template(const sc_event *event, sc_addr arg)
+void no_books_found_answer(sc_addr answer)
+{
+    appendIntoAnswer(answer, keynode_answer_books_not_found);
+    appendIntoAnswer(answer, keynode_nrel_translation);
+
+    sc_iterator5* translation_iter = sc_iterator5_a_a_f_a_f_new(s_books_ctx,
+                                                                0,
+                                                                sc_type_arc_common | sc_type_const,
+                                                                keynode_answer_books_not_found,
+                                                                sc_type_arc_pos_const_perm,
+                                                                keynode_nrel_translation);
+    while (SC_TRUE == sc_iterator5_next(translation_iter))
+    {
+        appendIntoAnswer(answer, sc_iterator5_value(translation_iter, 0));
+        appendIntoAnswer(answer, sc_iterator5_value(translation_iter, 1));
+        appendIntoAnswer(answer, sc_iterator5_value(translation_iter, 3));
+    }
+}
+
+sc_result agent_search_book_template(const sc_event* event, sc_addr arg)
 {
     sc_addr question;
 
@@ -91,7 +112,7 @@ sc_result agent_search_book_template(const sc_event *event, sc_addr arg)
         return SC_RESULT_ERROR_INVALID_PARAMS;
 
     // check question type
-    if (sc_helper_check_arc(s_books_ctx, keynode_question_book_template, question, sc_type_arc_pos_const_perm) == SC_FALSE)
+    if (SC_FALSE == sc_helper_check_arc(s_books_ctx, keynode_question_book_template, question, sc_type_arc_pos_const_perm))
         return SC_RESULT_ERROR_INVALID_TYPE;
 
     printf("~~~Searching book by template~~~~\n");
@@ -109,7 +130,7 @@ sc_result agent_search_book_template(const sc_event *event, sc_addr arg)
 
         sc_type_result resolved_links;
 
-        if (resolve_links(pattern, resolved_links))
+        if (SC_TRUE == resolve_links(pattern, resolved_links))
         {
             // run sys_search
             sc_type_result_vector result_vector;
@@ -122,7 +143,11 @@ sc_result agent_search_book_template(const sc_event *event, sc_addr arg)
                 for (result_it = result_vector.begin(); result_it != result_vector.end(); ++result_it)
                     append_book_to_answer(*result_it, answer);
             }
+            else
+                no_books_found_answer(answer);
         }
+        else
+            no_books_found_answer(answer);
     }
     sc_iterator3_free(pattern_iter);
 

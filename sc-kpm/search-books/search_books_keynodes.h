@@ -12,15 +12,12 @@
 extern sc_addr keynode_book;
 
 extern sc_addr keynode_question_book_template;
-
-extern sc_addr keynode_nrel_answer;
-extern sc_addr keynode_question_finished;
 extern sc_addr keynode_question_initiated;
-extern sc_addr keynode_question;
-extern sc_addr keynode_nrel_main_idtf;
-extern sc_addr keynode_system_element;
+extern sc_addr keynode_answer_books_not_found;
 
-//! Initialie keynodes that used by search books module
+extern sc_addr keynode_nrel_translation;
+
+//! Initialize keynodes used by search books module
 sc_result search_books_keynodes_initialize();
 
 #endif
