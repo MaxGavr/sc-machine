@@ -16,6 +16,7 @@ extern sc_addr keynode_question_initiated;
 extern sc_addr keynode_answer_books_not_found;
 
 extern sc_addr keynode_nrel_translation;
+extern sc_addr keynode_resolving_link;
 
 //! Initialize keynodes used by search books module
 sc_result search_books_keynodes_initialize();

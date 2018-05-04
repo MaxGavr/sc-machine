@@ -17,6 +17,7 @@ sc_addr keynode_question_initiated;
 sc_addr keynode_answer_books_not_found;
 
 sc_addr keynode_nrel_translation;
+sc_addr keynode_resolving_link;
 
 const char keynode_book_str[] = "book";
 
@@ -25,6 +26,7 @@ const char keynode_question_initiated_str[] = "question_initiated";
 const char keynode_answer_books_not_found_str[] = "answer_search_book_by_template_not_found";
 
 const char keynode_nrel_translation_str[] = "nrel_sc_text_translation";
+const char keynode_resolving_link_str[] = "resolving_link";
 
 
 sc_result search_books_keynodes_initialize()
@@ -36,6 +38,7 @@ sc_result search_books_keynodes_initialize()
     RESOLVE_KEYNODE(s_books_ctx, keynode_answer_books_not_found);
 
     RESOLVE_KEYNODE(s_books_ctx, keynode_nrel_translation);
+    RESOLVE_KEYNODE(s_books_ctx, keynode_resolving_link);
 
     return SC_RESULT_OK;
 }

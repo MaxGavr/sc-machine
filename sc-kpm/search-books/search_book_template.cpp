@@ -16,21 +16,51 @@ extern "C"
 // for sys_search
 #include <sc-kpm/scp/scp_lib/scp_system_operators/sc_system_search.h>
 
+sc_bool get_resolving_link_translation(sc_addr resolving_link, sc_addr& translation_link)
+{
+    sc_iterator5* translation_iter = sc_iterator5_a_a_f_a_f_new(s_books_ctx,
+                                                                sc_type_link,
+                                                                sc_type_arc_common | sc_type_var,
+                                                                resolving_link,
+                                                                sc_type_arc_pos_var_perm,
+                                                                keynode_nrel_translation);
+    if (SC_TRUE == sc_iterator5_next(translation_iter))
+    {
+        translation_link = sc_iterator5_value(translation_iter, 0);
+        sc_iterator5_free(translation_iter);
+
+        return SC_TRUE;
+    }
+    sc_iterator5_free(translation_iter);
+
+    return SC_FALSE;
+}
+
 
 sc_bool resolve_links(sc_addr pattern, sc_type_result& resolved_links)
 {
     sc_bool links_resolved = SC_TRUE;
 
-    sc_iterator3* links_iterator = sc_iterator3_f_a_a_new(s_books_ctx,
-                                                          pattern,
-                                                          sc_type_arc_pos_const_perm,
-                                                          sc_type_link);
-    while (sc_iterator3_next(links_iterator) == SC_TRUE)
+    sc_iterator3* pattern_iter = sc_iterator3_f_a_a_new(s_books_ctx,
+                                                        pattern,
+                                                        sc_type_arc_pos_const_perm,
+                                                        sc_type_node | sc_type_var);
+    while (SC_TRUE == sc_iterator3_next(pattern_iter))
     {
-        sc_addr link = sc_iterator3_value(links_iterator, 2);
+        sc_addr link = sc_iterator3_value(pattern_iter, 2);
+
+        if (SC_FALSE == sc_helper_check_arc(s_books_ctx, keynode_resolving_link, link, sc_type_arc_pos_var_perm))
+            continue;
+
+        sc_addr resolved_link;
+        if (!get_resolving_link_translation(link, resolved_link))
+        {
+            printf("Can't find translation of resolving link\n");
+            return SC_FALSE;
+        }
 
         sc_stream* link_content = NULL;
-        sc_memory_get_link_content(s_books_ctx, link, &link_content);
+        sc_memory_get_link_content(s_books_ctx, resolved_link, &link_content);
 
         sc_char link_content_str[256] = "";
         sc_uint32 link_content_length;
@@ -52,10 +82,12 @@ sc_bool resolve_links(sc_addr pattern, sc_type_result& resolved_links)
             break;
         }
 
-        sc_addr found_link = SC_ADDR_IS_EQUAL(found_links[0], link) ? found_links[1] : found_links[0];
+        printf("Link \"%s\" successfully resolved\n", link_content_str);
+
+        sc_addr found_link = SC_ADDR_IS_EQUAL(found_links[0], resolved_link) ? found_links[1] : found_links[0];
         resolved_links[link] = found_link;
     }
-    sc_iterator3_free(links_iterator);
+    sc_iterator3_free(pattern_iter);
 
     return links_resolved;
 }
@@ -75,7 +107,7 @@ void append_book_to_answer(sc_type_result* search_result, sc_addr answer)
         {
             printf("Found book \"");
             printIdtf(s_books_ctx, sc_iterator3_value(book_iter, 2));
-            printf("\n");
+            printf("\"\n");
 
             appendIntoAnswer(answer, sc_iterator3_value(book_iter, 1));
             appendIntoAnswer(answer, sc_iterator3_value(book_iter, 2));
@@ -134,7 +166,7 @@ sc_result agent_search_book_template(const sc_event* event, sc_addr arg)
         {
             // run sys_search
             sc_type_result_vector result_vector;
-            if (SC_RESULT_OK == system_sys_search(s_books_ctx, pattern, resolved_links, &result_vector))
+            if (SC_RESULT_OK == system_sys_search_only_full(s_books_ctx, pattern, resolved_links, &result_vector))
             {
                 appendIntoAnswer(answer, keynode_book);
 
