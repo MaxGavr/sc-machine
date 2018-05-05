@@ -117,15 +117,15 @@ void append_book_to_answer(sc_type_result* search_result, sc_addr answer)
     }
 }
 
-void no_books_found_answer(sc_addr answer)
+void set_answer_type(sc_addr answer, sc_addr answer_type)
 {
-    appendIntoAnswer(answer, keynode_answer_books_not_found);
+    appendIntoAnswer(answer, answer_type);
     appendIntoAnswer(answer, keynode_nrel_translation);
 
     sc_iterator5* translation_iter = sc_iterator5_a_a_f_a_f_new(s_books_ctx,
                                                                 0,
                                                                 sc_type_arc_common | sc_type_const,
-                                                                keynode_answer_books_not_found,
+                                                                answer_type,
                                                                 sc_type_arc_pos_const_perm,
                                                                 keynode_nrel_translation);
     while (SC_TRUE == sc_iterator5_next(translation_iter))
@@ -160,27 +160,37 @@ sc_result agent_search_book_template(const sc_event* event, sc_addr arg)
     {
         sc_addr pattern = sc_iterator3_value(pattern_iter, 2);
 
-        sc_type_result resolved_links;
-
-        if (SC_TRUE == resolve_links(pattern, resolved_links))
+        // check if pattern is a book search pattern
+        if (SC_TRUE == sc_helper_check_arc(s_books_ctx, keynode_book_search_pattern, pattern, sc_type_arc_pos_const_perm))
         {
-            // run sys_search
-            sc_type_result_vector result_vector;
-            if (SC_RESULT_OK == system_sys_search_only_full(s_books_ctx, pattern, resolved_links, &result_vector))
-            {
-                appendIntoAnswer(answer, keynode_book);
+            sc_type_result resolved_links;
 
-                // extract books from found structures
-                sc_type_result_vector::iterator result_it;
-                for (result_it = result_vector.begin(); result_it != result_vector.end(); ++result_it)
-                    append_book_to_answer(*result_it, answer);
+            if (SC_TRUE == resolve_links(pattern, resolved_links))
+            {
+                // run sys_search
+                sc_type_result_vector result_vector;
+                sc_result result = system_sys_search_only_full(s_books_ctx, pattern, resolved_links, &result_vector);
+                if (SC_RESULT_OK == result && !result_vector.empty())
+                {
+                    appendIntoAnswer(answer, keynode_book);
+
+                    // extract books from found structures
+                    sc_type_result_vector::iterator result_it;
+                    for (result_it = result_vector.begin(); result_it != result_vector.end(); ++result_it)
+                        append_book_to_answer(*result_it, answer);
+                }
+                else
+                    set_answer_type(answer, keynode_answer_books_not_found);
             }
             else
-                no_books_found_answer(answer);
+                set_answer_type(answer, keynode_answer_books_not_found);
         }
         else
-            no_books_found_answer(answer);
+            set_answer_type(answer, keynode_answer_not_pattern);
     }
+    else
+        set_answer_type(answer, keynode_answer_not_pattern);
+
     sc_iterator3_free(pattern_iter);
 
     connect_answer_to_question(question, answer);
