@@ -11,8 +11,11 @@
 
 extern sc_addr keynode_book;
 extern sc_addr keynode_book_search_pattern;
+extern sc_addr keynode_nrel_characters;
+extern sc_addr keynode_character;
 
 extern sc_addr keynode_question_book_template;
+extern sc_addr keynode_question_book_characters;
 extern sc_addr keynode_question_initiated;
 
 extern sc_addr keynode_answer_books_not_found;
