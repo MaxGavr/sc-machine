@@ -12,11 +12,14 @@ extern "C"
 #include "sc-kpm/search/search_utils.h"
 #include "sc_helper.h"
 #include "sc_memory_headers.h"
-#include "stdio.h"
 }
+
+#include "search_books_utils.h"
+
 
 sc_addr question;
 sc_event* event_answer_search_book_characters;
+
 
 void append_to_pattern(sc_addr pattern, sc_addr element)
 {
@@ -66,7 +69,7 @@ void append_characters_to_pattern(sc_addr pattern, sc_addr book, sc_addr set_of_
             sc_addr char_arc = sc_memory_arc_new(s_books_ctx, sc_type_arc_pos_var_perm, book_characters, element);
             append_to_pattern(pattern, char_arc);
 
-            printf("Appended character to pattern\n");
+            DEBUG_MESSAGE("Appended character to pattern");
         }
     }
     sc_iterator3_free(set_iterator);
@@ -94,14 +97,14 @@ sc_result agent_search_book_characters_show_answer(const sc_event* event, sc_add
     if (event_answer_search_book_characters)
         sc_event_destroy(event_answer_search_book_characters);
 
-    printf("~~~Search by characters completed~~~\n");
+    DEBUG_MESSAGE("~~~Search by characters completed~~~");
 
     return SC_RESULT_OK;
 }
 
 void initialize_book_search_template_agent(sc_addr pattern)
 {
-    printf("Initialize agent of searching by pattern\n");
+    DEBUG_MESSAGE("Initialize agent of searching by pattern");
 
     // create question of type question_search_book_by_template
     sc_addr search_question = sc_memory_node_new(s_books_ctx, sc_type_const);
@@ -111,7 +114,7 @@ void initialize_book_search_template_agent(sc_addr pattern)
     // subscribe for event of creating answer for question_search_book_by_template question
     event_answer_search_book_characters = sc_event_new(s_books_ctx, search_question, SC_EVENT_ADD_OUTPUT_ARC, 0, agent_search_book_characters_show_answer, 0);
     if (event_answer_search_book_characters == null_ptr)
-        printf("Failed to subscribe for event\n");
+        DEBUG_MESSAGE("Failed to subscribe for event");
 
     // initialize agent that searchs book by template
     sc_memory_arc_new(s_books_ctx, sc_type_arc_pos_const_perm, keynode_question_initiated, search_question);
@@ -130,7 +133,7 @@ sc_result agent_search_book_characters(const sc_event* event, sc_addr arg)
     // preserve question node beetween search_book_by_template query and answer
     question = tmp_question;
 
-    printf("~~~Searching book by characters~~~~\n");
+    DEBUG_MESSAGE("~~~Searching book by characters~~~~");
 
     sc_iterator3* char_set_iter = sc_iterator3_f_a_a_new(s_books_ctx,
                                                          question,
@@ -142,10 +145,10 @@ sc_result agent_search_book_characters(const sc_event* event, sc_addr arg)
         sc_addr set_of_characters = sc_iterator3_value(char_set_iter, 2);
 
         sc_addr pattern, book;
-        printf("Creating book search pattern\n");
+        DEBUG_MESSAGE("Creating book search pattern");
         create_book_search_pattern(pattern, book);
 
-        printf("Appending characters to pattern\n");
+        DEBUG_MESSAGE("Appending characters to pattern");
         append_characters_to_pattern(pattern, book, set_of_characters);
 
         initialize_book_search_template_agent(pattern);

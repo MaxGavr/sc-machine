@@ -13,6 +13,8 @@ extern "C"
 #include "sc_helper.h"
 }
 
+#include "search_books_utils.h"
+
 // for sys_search
 #include <sc-kpm/scp/scp_lib/scp_system_operators/sc_system_search.h>
 
@@ -55,7 +57,7 @@ sc_bool resolve_links(sc_addr pattern, sc_type_result& resolved_links)
         sc_addr resolved_link;
         if (!get_resolving_link_translation(link, resolved_link))
         {
-            printf("Can't find translation of resolving link\n");
+            DEBUG_MESSAGE("Can't find translation of resolving link");
             return SC_FALSE;
         }
 
@@ -66,7 +68,7 @@ sc_bool resolve_links(sc_addr pattern, sc_type_result& resolved_links)
         sc_uint32 link_content_length;
         sc_stream_read_data(link_content, link_content_str, 256, &link_content_length);
 
-        printf("Resolving link \"%s\"\n", link_content_str);
+        DEBUG_MESSAGE("Resolving link \"" << link_content_str << "\"");
 
         sc_addr* found_links = NULL;
         sc_uint32 found_links_count = 0;
@@ -74,15 +76,15 @@ sc_bool resolve_links(sc_addr pattern, sc_type_result& resolved_links)
         if (result != SC_RESULT_OK || found_links_count != 2)
         {
             if (found_links_count > 2)
-                printf("Found >1 links with the same content\n");
+                DEBUG_MESSAGE("Found >1 links with the same content");
 
-            printf("Failed to resolve link\n");
+            DEBUG_MESSAGE("Failed to resolve link");
 
             links_resolved = SC_FALSE;
             break;
         }
 
-        printf("Link \"%s\" successfully resolved\n", link_content_str);
+        DEBUG_MESSAGE("Link \"" << link_content_str << "\" successfully resolved");
 
         sc_addr found_link = SC_ADDR_IS_EQUAL(found_links[0], resolved_link) ? found_links[1] : found_links[0];
         resolved_links[link] = found_link;
@@ -105,9 +107,9 @@ void append_book_to_answer(sc_type_result* search_result, sc_addr answer)
                                            result_iter->second);
         if (sc_iterator3_next(book_iter) == SC_TRUE)
         {
-            printf("Found book \"");
+            DEBUG_MESSAGE("Found book:");
             printIdtf(s_books_ctx, sc_iterator3_value(book_iter, 2));
-            printf("\"\n");
+            DEBUG_MESSAGE("");
 
             appendIntoAnswer(answer, sc_iterator3_value(book_iter, 1));
             appendIntoAnswer(answer, sc_iterator3_value(book_iter, 2));
@@ -147,7 +149,7 @@ sc_result agent_search_book_template(const sc_event* event, sc_addr arg)
     if (SC_FALSE == sc_helper_check_arc(s_books_ctx, keynode_question_book_template, question, sc_type_arc_pos_const_perm))
         return SC_RESULT_ERROR_INVALID_TYPE;
 
-    printf("~~~Searching book by template~~~~\n");
+    DEBUG_MESSAGE("~~~Searching book by template~~~~");
 
     sc_addr answer = create_answer_node();
 
@@ -196,7 +198,7 @@ sc_result agent_search_book_template(const sc_event* event, sc_addr arg)
     connect_answer_to_question(question, answer);
     finish_question(question);
 
-    printf("~~~Search completed~~~\n");
+    DEBUG_MESSAGE("~~~Search completed~~~");
 
     return SC_RESULT_OK;
 }
