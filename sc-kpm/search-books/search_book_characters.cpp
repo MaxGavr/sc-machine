@@ -14,7 +14,7 @@ extern "C"
 #include "sc_memory_headers.h"
 }
 
-#include "search_books_utils.h"
+#include "search_books_debug_utils.h"
 
 
 sc_addr question;

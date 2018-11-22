@@ -13,7 +13,7 @@ extern "C"
 #include "sc_helper.h"
 }
 
-#include "search_books_utils.h"
+#include "search_books_debug_utils.h"
 
 // for sys_search
 #include <sc-kpm/scp/scp_lib/scp_system_operators/sc_system_search.h>
