@@ -18,7 +18,7 @@ sc_memory_context* s_books_ctx = 0;
 
 sc_event* event_question_search_book_template;
 sc_event* event_question_search_book_characters;
-sc_event* event_question_search_book_general_info;
+sc_event* event_question_append_general_info;
 
 
 // --------------------- Module ------------------------
@@ -38,8 +38,8 @@ _SC_EXT_EXTERN sc_result initialize()
     if (event_question_search_book_characters == null_ptr)
         return SC_RESULT_ERROR;
 
-    event_question_search_book_general_info = sc_event_new(s_books_ctx, keynode_question_initiated, SC_EVENT_ADD_OUTPUT_ARC, 0, agent_search_book_general_info, 0);
-    if (event_question_search_book_general_info == null_ptr)
+    event_question_append_general_info = sc_event_new(s_books_ctx, keynode_question_initiated, SC_EVENT_ADD_OUTPUT_ARC, 0, agent_search_book_general_info, 0);
+    if (event_question_append_general_info == null_ptr)
         return SC_RESULT_ERROR;
 
     return SC_RESULT_OK;
@@ -53,8 +53,8 @@ _SC_EXT_EXTERN sc_result shutdown()
     if (event_question_search_book_characters)
         sc_event_destroy(event_question_search_book_characters);
 
-    if (event_question_search_book_general_info)
-        sc_event_destroy(event_question_search_book_general_info);
+    if (event_question_append_general_info)
+        sc_event_destroy(event_question_append_general_info);
 
     sc_memory_context_free(s_books_ctx);
 

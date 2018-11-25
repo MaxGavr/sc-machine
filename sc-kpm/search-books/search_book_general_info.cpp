@@ -43,17 +43,19 @@ sc_addr get_book_from_pattern(sc_addr pattern)
     sc_addr book;
     SC_ADDR_MAKE_EMPTY(book);
 
-    sc_iterator5* book_it = sc_iterator5_f_a_a_a_f_new(s_books_ctx,
-                                                      pattern,
-                                                      sc_type_arc_pos_const_perm,
-                                                      0,
-                                                      sc_type_arc_pos_var_perm,
-                                                      keynode_book);
+    sc_iterator3* book_it = sc_iterator3_f_a_a_new(s_books_ctx,
+                                                   pattern,
+                                                   sc_type_arc_pos_const_perm,
+                                                   0);
 
-    if (SC_TRUE == sc_iterator5_next(book_it))
-        book = sc_iterator5_value(book_it, 2);
+    while (SC_TRUE == sc_iterator3_next(book_it))
+    {
+        sc_addr pattern_el = sc_iterator3_value(book_it, 2);
 
-    sc_iterator5_free(book_it);
+        if (SC_TRUE == sc_helper_check_arc(s_books_ctx, keynode_book, pattern_el, sc_type_arc_pos_var_perm))
+            book = pattern_el;
+    }
+    sc_iterator3_free(book_it);
 
     return book;
 }
@@ -65,9 +67,7 @@ void add_author_name_to_pattern(sc_addr pattern, sc_addr book, sc_addr author_na
     sc_addr resolving_link = utils_node_new_var();
     utils_append_to_pattern(pattern, resolving_link);
 
-    sc_addr resolving_link_arc = utils_arc_new_var(keynode_resolving_link, resolving_link);
-    utils_append_to_pattern(pattern, resolving_link_arc);
-
+    utils_arc_new_var(keynode_resolving_link, resolving_link);
 
     sc_addr lang_arc = utils_arc_new_var(keynode_lang_ru, resolving_link);
     utils_append_to_pattern(pattern, lang_arc);
@@ -127,7 +127,7 @@ sc_result agent_search_book_general_info(const sc_event* event, sc_addr arg)
         return SC_RESULT_ERROR_INVALID_PARAMS;
 
     // check question type
-    if (SC_FALSE == sc_helper_check_arc(s_books_ctx, keynode_question_book_general_info, question, sc_type_arc_pos_const_perm))
+    if (SC_FALSE == sc_helper_check_arc(s_books_ctx, keynode_question_append_general_info, question, sc_type_arc_pos_const_perm))
         return SC_RESULT_ERROR_INVALID_TYPE;
 
     DEBUG_MESSAGE("Books agent (general info): initialize");
@@ -169,6 +169,7 @@ sc_result agent_search_book_general_info(const sc_event* event, sc_addr arg)
                 result = SC_RESULT_ERROR_INVALID_PARAMS;
             }
         }
+
         else
         {
             DEBUG_MESSAGE("Books agent (general info): failed to find search pattern");
@@ -181,6 +182,8 @@ sc_result agent_search_book_general_info(const sc_event* event, sc_addr arg)
         result = SC_RESULT_ERROR_INVALID_PARAMS;
     }
     sc_iterator3_free(params_it);
+
+    finish_question(question);
 
     DEBUG_MESSAGE("Books agent (general info): finished");
 
