@@ -7,14 +7,16 @@
 #ifndef _search_books_utils_h_
 #define _search_books_utils_h_
 
-#ifdef __cplusplus
 extern "C"
 {
-#endif
-
 #include "sc_memory.h"
+}
+
+#include <vector>
+
 
 void utils_append_to_pattern(sc_addr pattern, sc_addr element);
+void utils_append_to_pattern(sc_addr pattern, std::vector<sc_addr> elements);
 
 sc_addr utils_node_new(sc_type type);
 sc_addr utils_node_new_const();
@@ -24,8 +26,7 @@ sc_addr utils_arc_new(sc_type type, sc_addr begin, sc_addr end);
 sc_addr utils_arc_new_const(sc_addr begin, sc_addr end);
 sc_addr utils_arc_new_var(sc_addr begin, sc_addr end);
 
-#ifdef __cplusplus
-}
-#endif
+sc_addr get_agent_parameter(sc_addr parameters, sc_addr rrel_ordinal);
+sc_addr get_book_from_pattern(sc_addr pattern);
 
 #endif

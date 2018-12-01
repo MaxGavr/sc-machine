@@ -19,47 +19,6 @@ extern "C"
 
 
 
-sc_addr get_agent_parameter(sc_addr parameters, sc_addr rrel_ordinal)
-{
-    sc_addr param;
-    SC_ADDR_MAKE_EMPTY(param);
-
-    sc_iterator5* param_it = sc_iterator5_f_a_a_a_f_new(s_books_ctx,
-                                                        parameters,
-                                                        sc_type_arc_pos_const_perm,
-                                                        0,
-                                                        sc_type_arc_pos_const_perm,
-                                                        rrel_ordinal);
-    if (sc_iterator5_next(param_it) == SC_TRUE)
-        param = sc_iterator5_value(param_it, 2);
-
-    sc_iterator5_free(param_it);
-
-    return param;
-}
-
-sc_addr get_book_from_pattern(sc_addr pattern)
-{
-    sc_addr book;
-    SC_ADDR_MAKE_EMPTY(book);
-
-    sc_iterator3* book_it = sc_iterator3_f_a_a_new(s_books_ctx,
-                                                   pattern,
-                                                   sc_type_arc_pos_const_perm,
-                                                   0);
-
-    while (SC_TRUE == sc_iterator3_next(book_it))
-    {
-        sc_addr pattern_el = sc_iterator3_value(book_it, 2);
-
-        if (SC_TRUE == sc_helper_check_arc(s_books_ctx, keynode_book, pattern_el, sc_type_arc_pos_var_perm))
-            book = pattern_el;
-    }
-    sc_iterator3_free(book_it);
-
-    return book;
-}
-
 void add_author_name_to_pattern(sc_addr pattern, sc_addr book, sc_addr author_name_link)
 {
     DEBUG_MESSAGE("Books agent (general info): adding 'author name' to pattern");
