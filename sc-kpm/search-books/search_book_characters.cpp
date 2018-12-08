@@ -69,7 +69,7 @@ void append_characters_to_pattern(sc_addr pattern, sc_addr book, sc_addr set_of_
             sc_addr char_arc = sc_memory_arc_new(s_books_ctx, sc_type_arc_pos_var_perm, book_characters, element);
             append_to_pattern(pattern, char_arc);
 
-            DEBUG_MESSAGE("Appended character to pattern");
+            DEBUG_MESSAGE("Books (search by characters): appended character to pattern");
         }
     }
     sc_iterator3_free(set_iterator);
@@ -97,14 +97,14 @@ sc_result agent_search_book_characters_show_answer(const sc_event* event, sc_add
     if (event_answer_search_book_characters)
         sc_event_destroy(event_answer_search_book_characters);
 
-    DEBUG_MESSAGE("~~~Search by characters completed~~~");
+    DEBUG_MESSAGE("Books (search by characters): search by characters completed");
 
     return SC_RESULT_OK;
 }
 
 void initialize_book_search_template_agent(sc_addr pattern)
 {
-    DEBUG_MESSAGE("Initialize agent of searching by pattern");
+    DEBUG_MESSAGE("Books (search by characters): initialize agent of searching by pattern");
 
     // create question of type question_search_book_by_template
     sc_addr search_question = sc_memory_node_new(s_books_ctx, sc_type_const);
@@ -114,7 +114,7 @@ void initialize_book_search_template_agent(sc_addr pattern)
     // subscribe for event of creating answer for question_search_book_by_template question
     event_answer_search_book_characters = sc_event_new(s_books_ctx, search_question, SC_EVENT_ADD_OUTPUT_ARC, 0, agent_search_book_characters_show_answer, 0);
     if (event_answer_search_book_characters == null_ptr)
-        DEBUG_MESSAGE("Failed to subscribe for event");
+        DEBUG_MESSAGE("Books (search by characters): failed to subscribe for event");
 
     // initialize agent that searchs book by template
     sc_memory_arc_new(s_books_ctx, sc_type_arc_pos_const_perm, keynode_question_initiated, search_question);
@@ -133,7 +133,7 @@ sc_result agent_search_book_characters(const sc_event* event, sc_addr arg)
     // preserve question node beetween search_book_by_template query and answer
     question = tmp_question;
 
-    DEBUG_MESSAGE("~~~Searching book by characters~~~~");
+    DEBUG_MESSAGE("Books (search by characters): initialized");
 
     sc_iterator3* char_set_iter = sc_iterator3_f_a_a_new(s_books_ctx,
                                                          question,
@@ -145,15 +145,17 @@ sc_result agent_search_book_characters(const sc_event* event, sc_addr arg)
         sc_addr set_of_characters = sc_iterator3_value(char_set_iter, 2);
 
         sc_addr pattern, book;
-        DEBUG_MESSAGE("Creating book search pattern");
+        DEBUG_MESSAGE("Books (search by characters): creating book search pattern");
         create_book_search_pattern(pattern, book);
 
-        DEBUG_MESSAGE("Appending characters to pattern");
+        DEBUG_MESSAGE("Books (search by characters): appending characters to pattern");
         append_characters_to_pattern(pattern, book, set_of_characters);
 
         initialize_book_search_template_agent(pattern);
     }
     sc_iterator3_free(char_set_iter);
+
+    DEBUG_MESSAGE("Books (search by characters): finished");
 
     return SC_RESULT_OK;
 }

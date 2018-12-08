@@ -21,7 +21,7 @@ extern "C"
 
 void add_author_name_to_pattern(sc_addr pattern, sc_addr book, sc_addr author_name_link)
 {
-    DEBUG_MESSAGE("Books agent (general info): adding 'author name' to pattern");
+    DEBUG_MESSAGE("Books (append general info): adding 'author name' to pattern");
 
     sc_addr resolving_link = utils_node_new_var();
     utils_append_to_pattern(pattern, resolving_link);
@@ -56,7 +56,7 @@ void add_author_name_to_pattern(sc_addr pattern, sc_addr book, sc_addr author_na
 
 void add_genre_to_pattern(sc_addr pattern, sc_addr book, sc_addr genre)
 {
-    DEBUG_MESSAGE("Books agent (general info): adding 'genre' to pattern");
+    DEBUG_MESSAGE("Books (append general info): adding 'genre' to pattern");
 
     sc_addr genre_arc = utils_arc_new_var(genre, book);
 
@@ -66,7 +66,7 @@ void add_genre_to_pattern(sc_addr pattern, sc_addr book, sc_addr genre)
 
 void add_language_to_pattern(sc_addr pattern, sc_addr book, sc_addr language)
 {
-    DEBUG_MESSAGE("Books agent (general info): adding 'language' to pattern");
+    DEBUG_MESSAGE("Books (append general info): adding 'language' to pattern");
 
     sc_addr lang_arc = utils_arc_new(sc_type_arc_common | sc_type_var, language, book);
 
@@ -89,7 +89,7 @@ sc_result agent_search_book_general_info(const sc_event* event, sc_addr arg)
     if (SC_FALSE == sc_helper_check_arc(s_books_ctx, keynode_question_append_general_info, question, sc_type_arc_pos_const_perm))
         return SC_RESULT_ERROR_INVALID_TYPE;
 
-    DEBUG_MESSAGE("Books agent (general info): initialize");
+    DEBUG_MESSAGE("Books (append general info): initialize");
 
     sc_result result = SC_RESULT_OK;
 
@@ -124,27 +124,27 @@ sc_result agent_search_book_general_info(const sc_event* event, sc_addr arg)
             }
             else
             {
-                DEBUG_MESSAGE("Books agent (general info): failed to find book in search pattern");
+                DEBUG_MESSAGE("Books (append general info): failed to find book in search pattern");
                 result = SC_RESULT_ERROR_INVALID_PARAMS;
             }
         }
 
         else
         {
-            DEBUG_MESSAGE("Books agent (general info): failed to find search pattern");
+            DEBUG_MESSAGE("Books (append general info): failed to find search pattern");
             result = SC_RESULT_ERROR_INVALID_PARAMS;
         }
     }
     else
     {
-        DEBUG_MESSAGE("Books agent (general info): failed to find parameters set");
+        DEBUG_MESSAGE("Books (append general info): failed to find parameters set");
         result = SC_RESULT_ERROR_INVALID_PARAMS;
     }
     sc_iterator3_free(params_it);
 
     finish_question(question);
 
-    DEBUG_MESSAGE("Books agent (general info): finished");
+    DEBUG_MESSAGE("Books (append general info): finished");
 
     return result;
 }

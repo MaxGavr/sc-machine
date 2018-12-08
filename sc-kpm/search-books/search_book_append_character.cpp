@@ -33,13 +33,13 @@ sc_addr find_or_create_characters_set(sc_addr pattern, sc_addr book)
                                                            keynode_nrel_characters);
     if (sc_iterator5_next(char_set_it) == SC_TRUE)
     {
-        DEBUG_MESSAGE("Books agent (append character): found existing characters set");
+        DEBUG_MESSAGE("Books (append character): found existing characters set");
 
         characters_set = sc_iterator5_value(char_set_it, 0);
     }
     else
     {
-        DEBUG_MESSAGE("Books agent (append character): failed to find characters set, creating new one");
+        DEBUG_MESSAGE("Books (append character): failed to find characters set, creating new one");
 
         // if couldn't find, create one and append it to pattern
         characters_set = utils_node_new_var();
@@ -56,7 +56,7 @@ sc_addr find_or_create_characters_set(sc_addr pattern, sc_addr book)
 
 sc_addr append_new_character(sc_addr pattern, sc_addr book)
 {
-    DEBUG_MESSAGE("Books agent (append character): creating new character");
+    DEBUG_MESSAGE("Books (append character): creating new character");
 
     sc_addr characters = find_or_create_characters_set(pattern, book);
 
@@ -74,7 +74,7 @@ sc_addr append_new_character(sc_addr pattern, sc_addr book)
 
 void add_character_name_to_pattern(sc_addr pattern, sc_addr character, sc_addr character_name_link)
 {
-    DEBUG_MESSAGE("Books agent (append character): adding 'character name' to pattern");
+    DEBUG_MESSAGE("Books (append character): adding 'character name' to pattern");
 
     sc_addr resolving_link = utils_node_new_var();
     utils_append_to_pattern(pattern, resolving_link);
@@ -98,7 +98,7 @@ void add_character_name_to_pattern(sc_addr pattern, sc_addr character, sc_addr c
 
 void add_character_gender_to_pattern(sc_addr pattern, sc_addr character, sc_addr gender)
 {
-    DEBUG_MESSAGE("Books agent (append character): adding 'character gender' to pattern");
+    DEBUG_MESSAGE("Books (append character): adding 'character gender' to pattern");
 
     sc_addr gender_arc = utils_arc_new_var(gender, character);
 
@@ -108,7 +108,7 @@ void add_character_gender_to_pattern(sc_addr pattern, sc_addr character, sc_addr
 
 void add_character_type_to_pattern(sc_addr pattern, sc_addr book, sc_addr character, sc_addr character_type)
 {
-    DEBUG_MESSAGE("Books agent (characters): adding 'character type' to pattern");
+    DEBUG_MESSAGE("Books (append character): adding 'character type' to pattern");
 
     sc_addr characters = find_or_create_characters_set(pattern, book);
 
@@ -137,7 +137,7 @@ sc_result agent_search_book_append_character(const sc_event* event, sc_addr arg)
     if (SC_FALSE == sc_helper_check_arc(s_books_ctx, keynode_question_append_character, question, sc_type_arc_pos_const_perm))
         return SC_RESULT_ERROR_INVALID_TYPE;
 
-    DEBUG_MESSAGE("Books agent (append character): initialize");
+    DEBUG_MESSAGE("Books (append character): initialize");
 
     sc_result result = SC_RESULT_OK;
 
@@ -174,26 +174,26 @@ sc_result agent_search_book_append_character(const sc_event* event, sc_addr arg)
             }
             else
             {
-                DEBUG_MESSAGE("Books agent (append character): failed to find book in search pattern");
+                DEBUG_MESSAGE("Books (append character): failed to find book in search pattern");
                 result = SC_RESULT_ERROR_INVALID_PARAMS;
             }
         }
         else
         {
-            DEBUG_MESSAGE("Books agent (append character): failed to find search pattern");
+            DEBUG_MESSAGE("Books (append character): failed to find search pattern");
             result = SC_RESULT_ERROR_INVALID_PARAMS;
         }
     }
     else
     {
-        DEBUG_MESSAGE("Books agent (append character): failed to find parameters set");
+        DEBUG_MESSAGE("Books (append character): failed to find parameters set");
         result = SC_RESULT_ERROR_INVALID_PARAMS;
     }
     sc_iterator3_free(params_it);
 
     finish_question(question);
 
-    DEBUG_MESSAGE("Books agent (append character): finished");
+    DEBUG_MESSAGE("Books (append character): finished");
 
     return result;
 }
