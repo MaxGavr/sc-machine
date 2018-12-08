@@ -15,8 +15,12 @@ extern "C"
 
 #include "search_books_debug_utils.h"
 
+#include "algorithm"
+
 // for sys_search
 #include <sc-kpm/scp/scp_lib/scp_system_operators/sc_system_search.h>
+
+
 
 sc_bool get_resolving_link_translation(sc_addr resolving_link, sc_addr& translation_link)
 {
@@ -38,6 +42,50 @@ sc_bool get_resolving_link_translation(sc_addr resolving_link, sc_addr& translat
     return SC_FALSE;
 }
 
+bool is_translation_of_resolved_link(sc_addr element)
+{
+    bool isTranslation = false;
+
+    sc_iterator5* translation_it = sc_iterator5_f_a_a_a_f_new(s_books_ctx,
+                                                              element,
+                                                              sc_type_arc_common,
+                                                              sc_type_node,
+                                                              sc_type_arc_access,
+                                                              keynode_nrel_translation);
+
+    while (SC_TRUE == sc_iterator5_next(translation_it))
+    {
+        sc_addr translation = sc_iterator5_value(translation_it, 2);
+
+        if (SC_TRUE == sc_helper_check_arc(s_books_ctx, keynode_resolving_link, translation, sc_type_arc_access))
+        {
+            isTranslation = true;
+            break;
+        }
+    }
+
+    sc_iterator5_free(translation_it);
+
+    return isTranslation;
+}
+
+void filter_resolved_links_from_search_patterns(sc_addr_vector& links)
+{
+    links.erase(std::remove_if(links.begin(), links.end(), is_translation_of_resolved_link), links.end());
+}
+
+sc_result find_links_with_content(sc_stream* content, sc_addr_vector& found_links)
+{
+    sc_addr* found_links_ptr = nullptr;
+    sc_uint32 found_links_count = 0;
+    sc_result result = sc_memory_find_links_with_content(s_books_ctx, content, &found_links_ptr, &found_links_count);
+
+    found_links.clear();
+    for (sc_uint32 i = 0; i < found_links_count; ++i)
+        found_links.push_back(found_links_ptr[i]);
+
+    return result;
+}
 
 sc_bool resolve_links(sc_addr pattern, sc_type_result& resolved_links)
 {
@@ -61,7 +109,7 @@ sc_bool resolve_links(sc_addr pattern, sc_type_result& resolved_links)
             return SC_FALSE;
         }
 
-        sc_stream* link_content = NULL;
+        sc_stream* link_content = nullptr;
         sc_memory_get_link_content(s_books_ctx, resolved_link, &link_content);
 
         sc_char link_content_str[256] = "";
@@ -70,12 +118,14 @@ sc_bool resolve_links(sc_addr pattern, sc_type_result& resolved_links)
 
         DEBUG_MESSAGE("Books (search by pattern): resolving link \"" << link_content_str << "\"");
 
-        sc_addr* found_links = NULL;
-        sc_uint32 found_links_count = 0;
-        sc_result result = sc_memory_find_links_with_content(s_books_ctx, link_content, &found_links, &found_links_count);
-        if (result != SC_RESULT_OK || found_links_count != 2)
+        sc_addr_vector found_links;
+        sc_result result = find_links_with_content(link_content, found_links);
+
+        filter_resolved_links_from_search_patterns(found_links);
+
+        if (result != SC_RESULT_OK || found_links.size() != 1)
         {
-            if (found_links_count > 2)
+            if (found_links.size() > 1)
                 DEBUG_MESSAGE("Books (search by pattern): found >1 links with the same content");
 
             DEBUG_MESSAGE("Books (search by pattern): failed to resolve link");
@@ -86,8 +136,7 @@ sc_bool resolve_links(sc_addr pattern, sc_type_result& resolved_links)
 
         DEBUG_MESSAGE("Books (search by pattern): link \"" << link_content_str << "\" successfully resolved");
 
-        sc_addr found_link = SC_ADDR_IS_EQUAL(found_links[0], resolved_link) ? found_links[1] : found_links[0];
-        resolved_links[link] = found_link;
+        resolved_links[link] = found_links.front();
     }
     sc_iterator3_free(pattern_iter);
 
@@ -98,13 +147,12 @@ void append_book_to_answer(sc_type_result* search_result, sc_addr answer)
 {
     sc_type_result::iterator result_iter;
 
-    sc_iterator3* book_iter;
     for (result_iter = search_result->begin(); result_iter != search_result->end(); ++result_iter)
     {
-        book_iter = sc_iterator3_f_a_f_new(s_books_ctx,
-                                           keynode_book,
-                                           sc_type_arc_pos_const_perm,
-                                           result_iter->second);
+        sc_iterator3* book_iter = sc_iterator3_f_a_f_new(s_books_ctx,
+                                                         keynode_book,
+                                                         sc_type_arc_pos_const_perm,
+                                                         result_iter->second);
         if (sc_iterator3_next(book_iter) == SC_TRUE)
         {
             DEBUG_MESSAGE("Books (search by pattern): found book:");
