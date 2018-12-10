@@ -19,8 +19,6 @@ extern sc_addr keynode_book_search_pattern;
 
 extern sc_addr keynode_nrel_characters;
 extern sc_addr keynode_character;
-extern sc_addr keynode_gender;
-extern sc_addr keynode_nrel_character_type;
 
 extern sc_addr keynode_question_book_template;
 extern sc_addr keynode_question_book_characters;

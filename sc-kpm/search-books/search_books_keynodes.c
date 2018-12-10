@@ -20,8 +20,6 @@ sc_addr keynode_book_search_pattern;
 
 sc_addr keynode_nrel_characters;
 sc_addr keynode_character;
-sc_addr keynode_gender;
-sc_addr keynode_nrel_character_type;
 
 sc_addr keynode_question_initiated;
 
@@ -52,8 +50,6 @@ const char keynode_book_search_pattern_str[] = "book_search_pattern";
 
 const char keynode_nrel_characters_str[] = "nrel_characters";
 const char keynode_character_str[] = "lit_person";
-const char keynode_gender_str[] = "gender";
-const char keynode_nrel_character_type_str[] = "nrel_character_type";
 
 const char keynode_question_initiated_str[] = "question_initiated";
 
@@ -86,8 +82,6 @@ sc_result search_books_keynodes_initialize()
 
     RESOLVE_KEYNODE(s_books_ctx, keynode_nrel_characters);
     RESOLVE_KEYNODE(s_books_ctx, keynode_character);
-    RESOLVE_KEYNODE(s_books_ctx, keynode_gender);
-    RESOLVE_KEYNODE(s_books_ctx, keynode_nrel_character_type);
 
     RESOLVE_KEYNODE(s_books_ctx, keynode_question_initiated);
 
